@@ -3,7 +3,9 @@ name: Build Jawa Timur AC APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
   build:
@@ -11,20 +13,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
       - name: Extract Android project ZIP
-        run: unzip -q jawatimurac-project.zip -d source
-      - name: Install Gradle 8.7
         run: |
-          curl -L https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/gradle.zip
-          unzip -q /tmp/gradle.zip -d "$HOME"
+          unzip -q jawatimurac-project.zip -d source
+
       - name: Build debug APK
         working-directory: source/jawatimurac-project
-        run: "$HOME/gradle-8.7/bin/gradle" --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
